@@ -315,7 +315,7 @@ The asterisk also does not match `.`, for your own good! `ls *flurble*` will fin
 My professor is a fan of Justin Bieber. Let's see what he does to find his favorite tunes.
 
 ```bash
-$ cd /Users/migod/Music/iTunes/iTunesMusic/BiebersGold
+$ cd /Users/_____/Music/iTunes/iTunesMusic/BiebersGold
 $ ls *[Bb]ieber*.mp3
 I-love-Justin-Beiber-fanSong.mp3
 Bieber-SingsBruceSpringsteen-concert-full-3hours.mp3
@@ -334,10 +334,10 @@ $ ls # aliased to ls -F
 Hearts> balloon* balloon.cc oldStuff/
 
 $ echo My balloon* home is $HOME
-My balloon balloon.cc is /Users/migod
+My balloon balloon.cc is /Users/_____
 
 $ echo My "balloon* home is $HOME"
-My balloon* home is /Users/migod
+My balloon* home is /Users/_____
 
 % echo My 'balloon* home is $HOME'
 My balloon* home is $HOME
