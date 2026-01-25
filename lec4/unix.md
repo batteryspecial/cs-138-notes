@@ -132,3 +132,213 @@ Queen of Spades
 Queen of Hearts
 ```
 
+# Commands in the UNIX Shell
+
+Generally, you are running cmd-line programs with options and arguments. Whatever you type is passed to bash. Typically it looks like this.
+
+```bash
+$ cmd -opt1 -opt2 arg1 -opt3 arg2 arg3 arg4
+```
+
+An option is something you select, an argument is a specific input that may be required by an option.
+
+A command can be onf of...
+1. An alias (a simpler name) for a built-in / external cmds with pre-supplied arguments.
+    - eg. `alias rm='rm -iv'`
+    - You can configure your own aliases in ~/.zshrc
+2. Built-in commnads.
+    - eg. `echo` and `type`
+3. An external program (an executable sitting on the system).
+    - eg `g++`, `clang`, `mkdir`, `ls`, `nano`, `emacs`, `java`, `egrep`...
+
+## How a Command is Parsed
+
+Given a command 
+```bash
+$ cmd -opt1 -opt2 arg1 -opt3 arg2 arg3 arg4
+```
+- First, the shell looks for an alias called `cmd`.
+- If none, look for a command called `cmd`.
+- If not, look along the user's `PATH` for `cmd`.
+
+__What is `PATH`?__
+
+There is a predefined shell variable called `PATH` that the shll uses to search for these external libraries. For me (Mac user) it is `/usr/bin`. 
+
+It might also be `/usr/local/bin` or `$HOME/bin`, etc. The shell will look into the paths in order, and if it really can't find anything, the shell will give an error in response.
+
+The value of PATH is typically set within the `.bashrc` file.
+
+```bash
+$ echo $PATH
+/Users/_____/Library/pnpm:/opt/homebrew/opt/node@24/bin:/Users/_____/.volta/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Users/_____/.volta/bin
+```
+
+## `type / which`
+
+Let `flurble` be a shell command. What is the meaning in your current context? Is it an alias for `flurble -frobozz`? Is it a built-in shell command? Is it an external executable?
+
+For `tcsh` and `bash`, typing `which flurble` will tell you the answer. For `bash` only, `type flurble` might give you more info.
+
+```bash
+$ pwd
+/usr/bin
+$ which ls
+/bin/ls
+$ cd ..
+$ which volta
+/Users/_____/.volta/bin/volta
+$ which pnpm
+/Users/_____/Library/pnpm/pnpm
+$ which npm 
+/opt/homebrew/opt/node@24/bin/npm
+```
+
+## `ls`
+
+List everything in your current directory. Can take in options `F` and `G`.
+
+```bash
+$ ls
+OBC-Firmware % ls
+CMakeLists.txt		gs			requirements.txt
+Dockerfile		hil			rm46l852.ccxml
+README.md		interfaces		scripts
+alembic			libs			setup.cfg
+alembic.ini		migrations		setup.py
+cmake			obc			test
+compose-dev.yaml	pyproject.toml
+docker-compose.yaml	python_test
+$ ls -F
+_____@eduroam-campus-10-36-71-20 OBC-Firmware % ls -F
+CMakeLists.txt		gs/			requirements.txt
+Dockerfile		hil/			rm46l852.ccxml
+README.md		interfaces/		scripts/
+alembic/		libs/			setup.cfg
+alembic.ini		migrations/		setup.py
+cmake/			obc/			test/
+compose-dev.yaml	pyproject.toml
+docker-compose.yaml	python_test/
+```
+
+`-G` or `--color` adds colors to special files like folders and executables. For example, the executable `a2p1` will be shown as `a2p1*` with `ls -F`. There are also other indicators, `@` means the file has extended attributes, which you can view using `xattr`.
+
+You can also use `ls -a` to show all files, including hidden ones. Use `ls -A` to show all files except for `.` and `..` (run `ls -a` to see what I mean). Run `ls -la` to use long listing format (verbose).
+
+```bash
+@ubuntu2404-012:~/cs138/assgts/assgt2/a2p1$ ls -la
+total 98
+drwxrws--x 5 _____ cs138     5 Jan 25 00:43 .
+drwxrws--x 6 _____ cs138     6 Jan 16 18:16 ..
+-rwxrwx--x 1 _____ cs138 92320 Jan 25 00:43 a2p1
+-rw-rw---- 1 _____ cs138  7257 Jan 25 00:47 a2p1.cc
+drwxrws--x 3 _____ cs138    29 Jan 25 00:47 build
+drwxrws--x 2 _____ cs138    24 Jan 24 22:17 outputs-expected
+drwxrws--x 2 _____ cs138    16 Jan 24 22:16 test-inputs
+```
+
+Let's start a subshell of tcsh and see what my professor has.
+
+```bash
+$ tcsh
+% which ls
+ls:        aliased to ls-F
+$ which ls-F
+ls-F: shell built-in command.
+$ ls
+Hearts@ balloon* balloon.cc oldStuff/
+```
+
+## `echo`
+
+Writes arugments, separated by spaces and terminated with a newline. It is usually a good idea to use double or single quotes to enclose the message.
+
+```bash
+$ echo no place like HOME
+no place like home
+$ echo " no place like HOME"
+ no place like home
+$ echo "no place like $HOME"
+no place like /Users/_____
+$ echo 'no place like $HOME'
+no place like $HOME
+$ echo no place like $HOME
+no place like /Users/_____
+```
+
+The shell finds the arguments, and although HOME looks like a system variable, there is no `$` so we are good. We can also use quotes and spaces, it does what you think it does. Note the single quote does not evaluate any commands.
+
+# Globbing
+
+Globbing are command-line pattern pattern expansions. It's like a wild card. You can access cmd line args by passing `int argv` and `char* argv[]` to main in C++.
+
+Global patterns apply only to args, not commands or options. Note all examples here assume `bash`. The shell preprocesses the command.
+
+__Special Chars__
+
+Suppose the current dir is `/u/jdoe/cs138/a1q1` which contains files `q1x.c`, `q2y.h`, `q2y.cc`, `q3z.cpp`.
+
+1. `*` matches 0 or more characters. `?` matches a single character.
+    ```bash
+    $ echo q*
+    q1x.C q2y.h q2y.cc q3z.cpp
+    $ echo q*.??
+    q2y.cc
+    ```
+
+2. {...} matches any alternative in the set. Happens before globbing.
+    ```bash
+    $ echo *.{C,cc,cpp}
+    q1x.C q2y.cc q3z.cpp
+    ```
+3. [...] matches one character in the set. Happens as a part of globbing.
+    ```bash
+    $ echo q[12]*
+    q1x.C q2y.h q2y.cc
+    ```
+4. [!...] matches 1 character not in the set.
+    ```bash
+    $ echo q[!12]*
+    q3z.cpp
+    ```
+5. Create ranges using `-`.
+    ```bash
+    q[0-3]*     # second character is 0,1,2,3
+    q[a-zA-z]*  # lower or upper case letter
+    q[!a-zA-Z]  # any char that is not a letter
+    ```
+
+`-` is escaped by putting it at the start or end of a set. For example `[-?*]*` matches file names starting with `-`, `?`, or `*`.
+
+The asterisk also does not match `.`, for your own good! `ls *flurble*` will find `flurblemaster` but will not find `.flurble`.
+
+My professor is a fan of Justin Bieber. Let's see what he does to find his favorite tunes.
+
+```bash
+$ cd /Users/migod/Music/iTunes/iTunesMusic/BiebersGold
+$ ls *[Bb]ieber*.mp3
+I-love-Justin-Beiber-fanSong.mp3
+Bieber-SingsBruceSpringsteen-concert-full-3hours.mp3
+lalalabieberlalala.mp
+```
+
+## Globbing and Quotes
+
+Globbing is turned off inside single and double quotes.
+- For single quotes, everything up to the enxt quote is protected, including newline (\n) and double quotes (").
+- For double quotes, everything is protected except doublequote, backquote(~), and `$VARs`.
+
+```bash
+% cd temp /
+$ ls # aliased to ls -F
+Hearts> balloon* balloon.cc oldStuff/
+
+$ echo My balloon* home is $HOME
+My balloon balloon.cc is /Users/migod
+
+$ echo My "balloon* home is $HOME"
+My balloon* home is /Users/migod
+
+% echo My 'balloon* home is $HOME'
+My balloon* home is $HOME
+```
