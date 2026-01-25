@@ -266,7 +266,7 @@ $ echo no place like $HOME
 no place like /Users/_____
 ```
 
-The shell finds the arguments, and although HOME looks like a system variable, there is no `$` so we are good. We can also use quotes and spaces, it does what you think it does. Note the single quote does not evaluate any commands.
+The shell finds the arguments, and although HOME looks like a system variable, there is no `$` so we are good. We can also use quotes and spaces, it does what you think it does. Note the single quote does not evaluate any commands. __Things enclosed by quotes are considered a single argument.__
 
 # Globbing
 
