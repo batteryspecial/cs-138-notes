@@ -36,4 +36,44 @@ int binary_search (vector<string> v, string key, int imin, int imax) {
 }
 ```
 
-## Towers of Hanoi
+# Towers of Hanoi
+
+In a temple in Hanoi, there are 64 differently-sized disks (rings) stacked on a pole in increasing order of size. The monks must reassemble the rings (in increasing order of size) on a second
+pole, using a third pole as a temporary.
+- The monks can move only one disk at a time
+- No larger disk may ever be placed on top of a smaller disk
+
+The solution is surprisingly simple. Try playing [the game](https://www.mathsisfun.com/games/towerofhanoi.html).
+
+Shift 'n-1' disks from 'A' to 'B', using C.
+Shift last disk from 'A' to 'C'.
+Shift 'n-1' disks from 'B' to 'C', using A.
+
+```cpp
+void hanoi(int N, int src, int dest, int temp) {
+    if (N == 0) return;
+    hanoi(N - 1, src, temp, dest);
+    cout << "Disk moved from " << src << " to " << temp << endl;
+    hanoi(N - 1, temp, dest, src);
+}
+```
+
+## Runtime of Towers of Hanoi
+
+Let H<sub>k</sub> be the number of moves required for k rings.
+
+By looking at the code, we see H<sub>0</sub>=0 and if k>0 then H<sub>k</sub>=2*H<sub>k-1</sub>+1
+But can we solve the recurrence relation directly?
+
+H0=0 H1=1 H2=3 H3=7 H4=15 H5=31
+
+Let's cleverly guess that H<sub>k</sub>=2<sup>k-1</sup>.
+We solve by induction.
+
+__Inductive Step__
+Assume H<sub>k-1</sub>=2<sup>k-1</sup>.-1, try to prove H<sub>k</sub> = 2<sup>k-1</sup>.
+
+Hk = 2*H<sub>k-1</sub>>+1
+= 2(2<sup>k-1</sup>-1) +1
+= 2<sup>k</sup>-2+1
+= 2<sup>k</sup>-1
