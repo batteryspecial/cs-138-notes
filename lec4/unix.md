@@ -342,3 +342,103 @@ My balloon* home is /Users/_____
 % echo My 'balloon* home is $HOME'
 My balloon* home is $HOME
 ```
+
+# Aliases
+
+A short or convenient name for a commonly used command.
+1. Preload preferred options.
+2. Shorten long commands.
+3. Redirect an old name to a new application.
+
+Here are some aliases I use!
+```bash
+alias python="python3"
+alias pip="pip3"
+```
+
+If we wanted more complex alises, use quotes. 
+If we want to see all the aliases we have, run `alias` in the terminal.
+
+```bash
+% alias d=date
+% d
+Wed Jan 28 20:20:00 EST 2026
+% alias now="d"
+% now
+Wed Jan 28 20:20:04 EST 2026
+% alias off="clear; exit"
+infin@eduroam-campus-10-36-130-101 ~ % alias
+d=date
+now=d
+off='clear; exit'
+pip=pip3
+python=python3
+run-help=man
+which-command=whence
+% off
+Saving session...
+...copying shared history...
+...saving history...truncating history files...
+...completed.
+
+[Process Terminated]
+% now
+zsh: command not found: now
+```
+
+## When to Use?
+
+Use aliases for command names or complete commands. Use an environment variable to remember an argument/name. This is because alias only expands for a command, not as a variable.
+
+In the example above, we see that aliases disappear after each session. There are two options to make aliases persistent.
+1. Insert aliases into the hidden ~/.shellrc file in the home directory. For Mac it is `~/.zshrc`. After adding the aliases we can run `source ~/.zshrc` to reload the configuration.
+2. Place a list of alias commands into a file (`.aliases`) and source that file from the ~/.shellrc file.
+
+```bash
+% nano .aliases # the python and pip aliases I had earlier
+% nano ~/.zshrc # added source $HOME/.aliases
+% python
+Python 3.14.0 (v3.14.0:___________, Oct  7 2025, 08:20:14) [Clang 16.0.0 (clang-1600.0.26.6)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 
+```
+
+## `exit`
+
+Not hard to understand. Exits the shell. Optional integer response status from 0 to 255. Larger values are truncated, negative values become unsigned. Exit defaults to zero, meaning success.
+
+Using 0 and 1 is good for now.
+
+# Sub-Shells
+
+As easy as running `tcsh` (for example) then hitting exit after you are done.
+
+```bash
+% tcsh
+[eduroam-campus-10-36-130-101:~] % echo "Hello tcsh!"
+Hello tcsh!
+[eduroam-campus-10-36-130-101:~] % echo ${0}
+-tcsh
+[eduroam-campus-10-36-130-101:~] % exit 0
+exit\
+% echo ${0}
+bash
+```
+
+## Changing Default Shell
+
+When you log into UNIX on the command line, you are started in an executable shell in your home directory. This is also true for UNIX, where the GUI is spawned by a script on the login shell.
+
+You can use `chsh` to change your login shell.
+
+```bash
+$ chsh
+Password: qwerty
+Changing the login shell for callofdutygod325
+Enter the new value, or press ENTER for default
+Login Shell [/bin/bash]: /bin/tcsh
+```
+
+No need to reload. This is a permanent change, until you decide to switch back.
+
+
