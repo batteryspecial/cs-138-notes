@@ -441,4 +441,165 @@ Login Shell [/bin/bash]: /bin/tcsh
 
 No need to reload. This is a permanent change, until you decide to switch back.
 
+# Basic Unix Commands and How to Use Them
 
+1. `man`
+2. `ls`
+3. `mkdir`
+4. `cp`, `mv`, `rm`
+5. `cat`, `less`
+
+## `man`
+
+Short for manual. Takes an argument that is a commands, and displays a __dense__ reference page for usage.
+Note, this is NOT a friendly tutorial.
+
+```bash
+$ man man
+MAN(1)                      General Commands Manual                     MAN(1)
+
+NAME
+     man, apropos, whatis – display online manual documentation pages
+
+SYNOPSIS
+     man [-adho] [-t | -w] [-M manpath] [-P pager] [-S mansect]
+         [-m arch[:machine]] [-p [eprtv]] [mansect] page ...
+
+     man -f [-d] [-M manpath] [-P pager] [-S mansect] keyword ...
+     whatis [-d] [-s mansect] keyword ...
+
+     man -k [-d] [-M manpath] [-P pager] [-S mansect] keyword ...
+     apropos [-d] [-s mansect] keyword ...
+
+DESCRIPTION
+     The man utility finds and displays online manual documentation pages.  If
+     mansect is provided, man restricts the search to the specific section of
+     the manual.
+
+     The sections of the manual are:
+           1.   General Commands Manual
+           2.   System Calls Manual
+```
+
+## `ls`
+
+Lists the contents of a directory.
+
+```bash
+$ ls [-l] [-a] [list of files / directory]
+```
+
+Using `-A` directories, using `-a` shows the dot files, typically not shown. `-l` gives long listing for each file. Using `-1` displays everything in one column.
+Can you guess what `-1 -l` does? Everything is displayed in one column, no verbose listing.
+
+### Additional Options
+
+- `-R` recursively lists contents of directories (do not try in large folders)!
+- `-t` sort by time modified (newest come first).
+- `-F` append * onto the names of executables, directories and @ onto the names of symlinks.
+- `-G` color code files, red for executables, blue for folders, pink for symlinks.
+
+Note for `-F` the characters are not actually there, they are appended as annotations. In general we should avoid globbed characters like `*,?[]` hence why on UNIX-based systems they are not allowed to be a part of a file name upon creation.
+
+## `mkdir`
+
+Makes directory or directories at specified locations. The usage is very simple, `mkdir [directory name list]`.
+
+## `cp`, `mv`, `rm`
+
+At the UNIX command line, there is no "trash" to store deleted files. Deletes are immediate and permanent. Wiped off your disk. Using `-i` asks if you are sure. Using `-v` verbosely states what the command will do, so you know which files are deleted.
+
+In my `~/.aliases` file I have
+```bash
+alias rm='rm -iv'
+alias cp='cp -iv'
+alias mv='mv -iv'
+```
+
+### `cp`
+
+Copy an existing file into a file with the same name (if in a different directory) or different name. You can copy many files at once, but you can't change their name. You can even copy entire directories, but you must use the `-r` option.
+
+```bash
+cp [-iv] source-file target-file
+cp [-iv] source-file-list target-dir
+cp [-iv] -r source-dir-list target-dir
+```
+
+### `mv`
+
+Almost exact same usage as `cp` but instead moves or renames an existing directory.
+
+```bash
+mv [-iv] src-file target-file
+mv [-iv] src-file-or-dir-list target-dir
+```
+
+If target-file does not exist, the src-file is renamed at the destination otherwise the target-file is replaced.
+Note, you cannot move a file into its own directory. `mv: cannot move 'dir' to a subdirectory of itself, 'dir/dir'`.
+
+### `rm`
+
+Deletes files. Deletes entire directories recursively with `-r`. Usage is simple.
+
+```bash
+rm [-ivfr] file-or-dir-list
+```
+
+`-f` means remove with force. There will be no verification for each file removed.
+`rm` is a dangerous command. Use with caution.
+
+## Example
+
+```bash
+$ cp f1 f2 # copy file f1 to f2 (overwrites old f2)
+$ cp f1 f2 f3 d # copy files f1, f2, f3 into dir d
+$ cp -r d1 d2 d3 # copy dirs d1, d2 recursively to dir d3
+$ mv f1 foo # rename file f1 to foo
+$ mv f2 f3 # delete file f3 and rename file f2 to f3
+$ mv f3 d1 d2 d3 # move file f3 + dirs d1, d2 into dir d3
+$ mv d1 d2 # if d2 is a normal file, then error
+# if d2 is an existing dir,
+# d1 is moved into it
+# If there's no existing file/dir named d2,
+# then d1 is renamed to d2
+$ rm f1 f2 f3 # file list
+$ rm -r d1 d2 # dir list, and all subfiles/dirs
+$ rm -r f1 d1 f2 # file and dir list
+```
+
+## `cat`, `less`
+
+Both commands "print" the contents of a file into the terminal. They are followed by a file list. Super simple usage.
+
+However, `cat` shows the contents in one continuous stream while `less` paginates the content, one screen at a time.
+What is the meaning of `less`? It's because `less` is actually a generalized version of an old command called `more`.
+
+### Controlling the Output
+```bash
+$ cat ~/hello.cc
+#include <iostream>
+using namespace std;
+int main (int argc, char* argv[]) {
+cout << "Hello world" << endl;
+}
+$ cat /usr/share/dict/words
+A
+A's
+AA's
+AB's
+ABM's
+^C
+$ cat
+hello there
+hello there
+world
+world
+^D
+```
+
+- __^C (CNTL-C)__ means interrupt the currently executing program (i.e., kill it NOW)
+- __^D (CNTL-D)__ sends the END_OF_FILE (EOF) signal to the currently executing program, so it knows there's no more input coming
+
+The shell opens the file and sends its contents to the standard input, `cat` reads the input from `stdin`, not directly from the file!
+Both commands have the same effect on the output stream, but operate a bit differently.
