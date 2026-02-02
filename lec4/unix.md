@@ -603,3 +603,52 @@ world
 
 The shell opens the file and sends its contents to the standard input, `cat` reads the input from `stdin`, not directly from the file!
 Both commands have the same effect on the output stream, but operate a bit differently.
+
+# Input / Output Redirection
+
+Every command is associated with three standard files!
+1. Input (0)
+2. Output (1)
+3. Error (2)
+
+In UNIX, `stdin`, `stdout`, `stderr`. In C++, we have our streams `cin`, `cout`, `cerr`. By default these are connected to the keyboard (input) and the UI (output & error).
+
+![alt text](<截屏2026-02-01 下午11.01.01.png>)
+
+## Example with `sort`
+
+```bash
+$ sort -n # -n means numeric sort, based on lines
+7 # sort reads unsorted values from stdin
+30
+5
+<CNTL-D> # <CNTL-D> (aka "^D") closes input file
+5 # (i.e., sends the EOF character)
+7 # sort prints sorted values to stdout
+30
+```
+
+Redirection allows us to take inputs form a file, and save outputs to a file. The command, however, is unaware of redirection!
+
+## Performing Redirections
+
+We use the operators `<`, `>`, `<<`, and `>>`.
+1. `<` means take inputs from a file.
+2. `>` (same as `1>`) means create a file, if needed, and __write__ outputs + errors to the file. Potentially destructive action.
+3. `>>` (same as `1>>`) means create a file, if needed, and __append__ the output + errors to the file.
+4. We can also redirect secondary output streams like `stderr` using `2>` and `2>>`.
+
+Let's see an example. Without looking further, what will each of these commands do?
+
+```bash
+$ sort –n < nums.txt
+$ sort –n < nums.txt > sorted.txt
+$ sort –n < nums.txt >> sorted.txt
+$ sort -n < nums.txt 1> sorted.txt 2> errors.txt
+```
+
+__Respectively__
+- Prints sorted `nums.txt` to CLI.
+- Saves sorted `nums.txt` to `sorted.txt`.
+- Appends sorted `nums.txt` to `sorted.txt`.
+- Saves sorted `nums.txt` to `sorted.txt` and any errors to `errors.txt`.
