@@ -652,3 +652,110 @@ __Respectively__
 - Saves sorted `nums.txt` to `sorted.txt`.
 - Appends sorted `nums.txt` to `sorted.txt`.
 - Saves sorted `nums.txt` to `sorted.txt` and any errors to `errors.txt`.
+
+# UNIX Pipelines
+
+First, what is a pipeline? A __pipeline__, in the simplest form is a series of processes. Pipelines have their own contexts in DevOps, system design, etc. but in UNIX pipelines follow the core philosophy "Do One Thing and Do It Well" which means, we can reliably "Write Programs to Work Together" to produce results we want.
+
+## Building a Pipeline
+
+Pipes (`|`) allow us to use the output of one program (`stdout`) as the input of another (`stdin`). It's a type of IO redirection.
+
+For example, how many words occur in the first 20 lines of `flurble.txt`, given `head -n [file]` prints the first `n` lines of a file, `wc` counts words, lines, and characters, and `wc -w` counts just words?
+
+```bash
+$ head -20 flurble.txt | wc -w
+$ cat flurble.txt | head -20 | wc -w
+```
+
+Easy solutions given above. No need to write a C++ program with `argc` and `*argv[]`. No need to write `head` results into a file. One line solution.
+
+## Exercise
+
+Suppse `word1.txt`, `word2.txt`, ... , contain lists of words, one word per line. Print a duplicate-free list of all words that occur in any of these files, given `uniq` removes adjacent duplicate lines from a stream and `sort` sorts lines in a file lexiographically.
+
+```bash
+$ cat words*.txt | sort | uniq
+```
+
+Yes. It is really that easy.
+
+## Why Pipelines?
+
+A multi-stage process using I/O redirection requires creation of intermediate (temp) files; e.g., store in file named result a sorted list of all lines of the file data not containing the string "fnord", and translating all 'b' chars into 'X' chars everywhere in each line.
+
+```bash
+$ sort data > sortedData
+$ egrep -v "fnord" sortedData > temp
+$ tr b X < temp > result
+$ rm sortedData temp
+```
+
+We have created a temporary file, which we have use in every line and clean up at the end. We also run the risk of overwriting data.
+
+The UNIX shell pipe operator `|` connects `stdout` for a command with `stdin` for the next command, without creating a temp file, and it's also one line.
+```bash
+$ sort data | grep -v "fnord" | tr b X > result
+```
+
+### Errors???
+
+Standard errors are __not__ piped unless redirected to the standard output, since `stderr` and `stdout` are two separate streams. Given that `2>&1` can redirect the error stream into the stardard output stream, how would you rewrite the above pipeline?
+
+```bash
+$ sort data 2>&1 | grep -v "fnord" 2>&1 | tr b X > result 2>&1
+```
+
+That's right! Now the errors stream also goes through the pipe. Fun fact, UNIX pipes are a standard process. This is not some niche trick.
+
+## Example
+
+Given the `find` command finds every instance of an argument in the current directory, and `sed 's|[^/]*/|   |g'` replaces all occurences of the string `[^/]*/`, meaning "characters not `/` but ends with `/`" with three spaces. Design a basic file hierarchy display.
+
+```bash
+$ find cs138 | sed 's|[^/]*/|   |g'
+cs138
+   al
+      q1x.C
+      q2y.h
+      q2y.cc
+      q3z.cpp
+```
+
+## Example
+
+As software engineers, we don't take ethics courses. Therefore we can do a little corporate blackmailing, like this.
+
+```bash
+$ cat appleStory.txt
+Apple did not violate patents owned by Samsung Electronics in making the iPod touch, iPhone and iPad, a judge at the International Trade Commission said in a preliminary ruling on Friday.
+
+Apple and Samsung have taken their bruising patent [...]
+
+$ cat appleStory.txt | sed 's|Apple|RIM|g' > rimstory.txt
+$ cat rimStory.txt
+RIM did not violate patents owned by Samsung Electronics in making the iPod touch, iPhone and iPad, a judge at the International Trade Commission said in a preliminary ruling on Friday.
+
+RIM and Samsung have taken their bruising patent [...]
+```
+
+RIM (research in motion) is the old name of Blackberry. No we substituted, using `sed`, every instance of "Apple" with "RIM". We have now turned Apple's lawsuit into RIM's lawsuit. Talking about using your skills for good.
+
+However, this still feels very fake because RIM does not make iPods.
+
+```bash
+§ cat appleStory.txt | sed 's|Apple|RIM|g' | sed 's|iPhone|Blackberry|g' > rimstory.txt
+$ cat rimStory.txt
+RIM did not violate patents owned by Samsung Electronics in making the iPod touch, Blackberry and iPad, a judge at the International Trade Commission said in a preliminary ruling on Friday.
+
+RIM and Samsung have taken their bruising patent [...]
+```
+
+We can go a step further.
+
+```bash
+$ cat appleStory.txt | sed 's|Apple|RIM|g' | sed 's|iPhone|Blackberry|g' | sed 's|iP[ao]d|Playbook|g' > rimstory.txt
+```
+
+You know the deal.
+
