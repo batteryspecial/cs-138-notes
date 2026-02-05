@@ -759,3 +759,44 @@ $ cat appleStory.txt | sed 's|Apple|RIM|g' | sed 's|iPhone|Blackberry|g' | sed '
 
 You know the deal.
 
+# `diff` / `cmp`
+
+Compares two files and compares them. We assume text files which are mostly similar. Often used to track source code or changes between versions (blame). You always have the option of using `git` insteading of running `diff` every time.
+
+## Example with `cmp`
+
+```bash
+$ cmp x y
+x y differ: char 7, line 4
+```
+
+New lines are counted, thus the character count is always +1. However, the `diff` command takes one step further by suggesting how to change the first file into the second using `patch`.
+
+```bash
+$ diff x y
+4,5c4 # replace lines 4+5 of 1st file
+< d # with line 4 of 2nd file
+< g
+---
+> e
+6a6,7 # after line 6 of 1st file
+> i # add lines 6+7 of 2nd file
+> g
+```
+
+Try taking a file with content, making some changes, and then run this in a __wide__ terminal.
+
+```bash
+$ sdiff file1 file2 | less # side by side
+$ vim –d file1 file2 # or just use vim
+```
+
+Congratulations you have yourself a homemade copy of git's merge editor.
+
+# Regression Testing
+
+We will talk about testing later in Lec 9. In professional software development, you typically have massive test suites to make sure it gets things right.
+
+As you make changes to the source code, you also re-run the old tests to make sure you didn't _regress_ to old behavior. One way is to create test files of what you expect and compare them with the actual output file. The comparison can be done using `diff`.
+
+This is regression testing. You are making sure new features do not invoke old bugs using explicit tests. A bug is a test case that you forgot to write.
