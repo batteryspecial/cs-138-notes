@@ -795,8 +795,105 @@ Congratulations you have yourself a homemade copy of git's merge editor.
 
 # Regression Testing
 
-We will talk about testing later in Lec 9. In professional software development, you typically have massive test suites to make sure it gets things right.
+We will talk about testing later in Lec 9 and 10. In professional software development, you typically have massive test suites to make sure it gets things right.
 
 As you make changes to the source code, you also re-run the old tests to make sure you didn't _regress_ to old behavior. One way is to create test files of what you expect and compare them with the actual output file. The comparison can be done using `diff`.
 
 This is regression testing. You are making sure new features do not invoke old bugs using explicit tests. A bug is a test case that you forgot to write.
+
+# `find` Command
+
+Searches for files and directories in a certain hierarchy, according to various criteria and options. Like a command line version of MacOS spotlight.
+How do you use?
+
+```bash
+$ find [dir-list] [expr]
+```
+
+__Options__
+- If `expr` is omitted we will match all file names.
+- `-name pattern` restricts file names to a globbing pattern.
+- If no directories are given, the search starts in the current directory '.'
+
+Which means running `find . *` is like `ls -R`, but on my device the former runs slower. Not sure why.
+
+## Example
+
+```bash
+$ find . -name "t*"
+./test.cc
+./testdata
+./oldTests/test-deprecated
+```
+
+Remember to wrap the glob pattern in double quotes. Before `find` runs, the shell performs glob expansion to match patterns, and wrapping the expression in double quotes tells the shell to pass the whole string to `find`, not the shell version.
+
+Of course, you can always wrap in `[]` to match exactly one character from the set.
+
+```bash
+$ find . -name "*.csv"
+./Development/hscsa/data/hammett_clean.csv
+./Development/hscsa/data/hammett_extended.csv
+```
+
+## More `find` Options
+
+`-type f, d` means select from files (`f`) or directories (`d`).
+`-maxDepth N` means recursively descend at most `N` directories levels, where `0` is the current directory.
+
+Fun fact you can even use logical operators to find combinations of expressions.
+
+```bash
+-not expr
+expr1 -a expr2
+expr1 -o expr2
+```
+
+If no operator is given the default operator is `-a`. We can use parenthesis `\( expr \)` to clarify order.
+
+Let's say I wanted to find all files in an old project that is not `.html` (perhaps I'm trying to find javascript or css).
+
+```bash
+$ find . -type f -not -name "*.html"
+```
+
+## Examples with `find`
+
+1. Recursively find only "normal" file names matching pattern `t*` starting in current dir.
+    ```bash
+    $ find . -type f -name "t*"
+    test.cc
+    ```
+2. Recursively find only file names in list (excluding hidden files) to a max. depth of 3, matching patterns `t*` or `*.C`.
+    ```bash
+    $ find . -type f -a -maxDepth 3 -a \(-name "t*" -o -name "*.C"\)
+    test.C
+    q1.C
+    testdata/data.C
+    ```
+
+Here's a bigger example from the professor's device.
+
+```bash
+% ls
+main.cc main.o zlurble/
+% find . –type f
+./main.cc
+./main.o
+./zlurble/bazz/balloon.cc
+./zlurble/bazz/main.cc
+./zlurble/kalumph.cc
+./zlurble/readme.txt
+% find . -name *.cc
+./main.cc
+./zlurble/bazz/main.cc
+% find . -name "*.cc"
+./main.cc
+./zlurble/bazz/balloon.cc
+./zlurble/bazz/main.cc
+./zlurble/kalumph.cc
+```
+
+Take a look at line 887. This is the consequence of not putting double quotes. Shell first performed glob expansion, matching `*.cc` with `main.cc`, the first thing it saw. Then the command effectively became `find . -name "main.cc"`.
+
+On line 890 we use double quotes and we get what we want, all the matching patterns. In case you are wondering, yes, we can put `find` in pipelines, although it is mostly a utility command.
