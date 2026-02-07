@@ -325,7 +325,7 @@ lalalabieberlalala.mp
 ## Globbing and Quotes
 
 Globbing is turned off inside single and double quotes.
-- For single quotes, everything up to the enxt quote is protected, including newline (\n) and double quotes (").
+- For single quotes, everything up to the next quote is protected, including newline (\n) and double quotes (").
 - For double quotes, everything is protected except doublequote, backquote(~), and `$VARs`.
 
 ```bash
@@ -897,3 +897,142 @@ main.cc main.o zlurble/
 Take a look at line 887. This is the consequence of not putting double quotes. Shell first performed glob expansion, matching `*.cc` with `main.cc`, the first thing it saw. Then the command effectively became `find . -name "main.cc"`.
 
 On line 890 we use double quotes and we get what we want, all the matching patterns. In case you are wondering, yes, we can put `find` in pipelines, although it is mostly a utility command.
+
+# Grep, Egrep and Regex
+
+Grep is a very powerful command, and regex is arguably one of the most powerful tools you can master. `grep` was created in one evening, by Ken Thompson, but `egrep` adds extra-powerful pattern matching abilities, but then it requires more work. `fgrep` is the fast version of grep, but obviously, is less flexible.
+
+## `egrep`
+
+Stands for extended global regular expression print. Finally, a UNIX command that actually stands for something. The name is self-explanatory, we can search and print lines from files given a matching pattern.
+
+```bash
+$ egrep [-irnv] pattern-string file-list
+```
+
+Fun fact, `egrep` is the same thing as `grep -E`.
+
+## Options of `egrep`
+
+1. `-i`
+    - Matching ignores case
+    - eg. "migod" matches with "MIGOD"
+2. `-r`
+    - Recursively search sub-directories
+    - Not recommended on large folders
+3. `-n`
+    - Print line numbers for searches
+4. `-v`
+    - Invert search
+    - Print all the lines that do __not__ match
+
+### Example
+
+List all files containing "main" in the currently directory, ending in ".cc".
+
+```bash
+egrep main *.cc
+```
+
+Question for you. In `find` we emphasized using quotes, but now in `egrep` we don't use double quotes. Why? Remember, the shell expands the expression first. In `find` using double quotes prevents globbing, but `egrep` does not understand the string in the same way; `egrep` will search for the string "*.cc" in the directory, which is not what we want.
+
+```bash
+$ egrep -n main *.cc
+q1.cc:33:int main() {
+q2.cc:45:int main() {
+```
+
+Fun fact, `egrep` is very powerful in pipelines.
+
+```bash
+$ egrep -i fred names.txt
+names.txt:Fred Derf
+names.txt:FRED HOLMES
+names.txt:Freddy Fazbear
+names.txt:speculated Freddy was responsible for the bite of '87, although
+$ egrep -i fred names.txt | wc –l
+4
+```
+
+## `egrep` Match Patterns
+
+### Regex Character Reference
+
+| Symbol | Description |
+| --- | --- |
+| `.` | Matches any single character. |
+| `(ab \| xyz)` | Groups expressions to match pattern `ab` or `xyz`. |
+| `[abc]` | Matches any single character (`a`, `b`, or `c`) within the brackets. |
+| `?` | Makes the preceding item optional; matches zero or one time. |
+| `*` | Matches the preceding item zero or more times. |
+| `+` | Matches the preceding item one or more times. |
+| `^` | Indicates the start of a line. |
+| `$` | Indicates the end of a line. |
+
+### Examples
+
+1. __List all lines of even length in `flurble.txt`.__
+
+    ```bash
+    $ cat flurble.txt | egrep '^(..)*$`'
+    ```
+
+    __Pause.__ Do you understand what just happened?
+
+    `(..)` means match any group of two characters. `*` means match the precending item (the group of 2 chars) any number of times. We are guranteed to have even lines.
+
+2. __List all files that contain exactly one "a" in our current directory.__
+
+    ```bash
+    ls -1 . | egrep "^[^a]*a[^a]*$"
+    ```
+
+    Another `egrep` monstrosity. Let's break things down. `[^a]*` means not "a", any number of times. This happens before and after the character "a", guranteeing we only have one a, nothing more, nothing less.
+
+3. __Find all five-letter English words beginning with 'e'.__
+
+```bash
+egrep '^e....$' /usr/public/dict/allwords.txt
+```
+
+4. __Print all lines in all .cc files in the current directory that contain the string "main" or "balloon".__
+
+How does "or" work in `grep`? We use `|`. Isn't that a UNIX pipe? We need to override UNIX behavior, and we can do that.
+
+```bash
+$ grep -E main|balloon *.cc
+bash: balloon: command not found
+$ grep -E (main|balloon) *.cc
+bash: syntax error near unexpected token '('
+
+$ grep -E "(main|balloon)" *.cc
+balloon-copy.cc: cout << colour << " balloon" << endl;
+balloon-copy.cc:int main (int argc, char* argv[]) {
+balloon.cc: cout << colour << " balloon" << endl;
+balloon.cc:int main (int argc, char* argv[]) {
+```
+
+We can also achieve a similar effect using single quotes, `$ grep -E 'main|balloon' *.cc`. Remember, single quotes protect everything, including parentheses and newline characters.
+
+### `egrep` Miniboss
+
+Something like this could appear on your CS138 midterm or final.
+
+List all lines in `file.txt` that
+- match start of line "^", then
+- match "#include", then
+- match 1 or more space or tab "[ ]+", then
+- match either """ or "<", then
+- match 1 or more characters ".+", then
+- match either """ or ">", then
+- match end of line "$", and
+- are in files with suffix ".h", ".c", or ".cc"
+
+```bash
+$ egrep "^#include[ ]+["<].+[">]$" *.{h,c,cc}
+```
+
+Congratulations, we have performed regex. `regex` libraries exist for most languages, just as proof of how powerful it is.
+
+Regex is a skill that takes years to master, although, the midterm expects us to be decently good with it.
+
