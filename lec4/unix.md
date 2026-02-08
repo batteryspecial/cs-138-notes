@@ -1161,4 +1161,4 @@ $ cd code
 code: Permission denied.
 ```
 
-
+__That's all for introduction to UNIX! Good luck on your exam!__
