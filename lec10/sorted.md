@@ -98,3 +98,22 @@ The priority queue is a queue. However each value has an integer priority. What 
 Thus, the PQ is a data container that is both sorted (queues are sorted by priority) and ordered (FIFO within each priority's own queue).
 
 The PQ is actually used in real-world software!
+
+## Specifications
+
+Does the highest and lowest priority in terms of value mean higher or lower? We will assume lowest (1) is the most important, for the sake of counting. The C++ standard library provides an implementation of `priority_queue`, which is what we should use in real production.
+
+Right now, let's try implementing a queue which is a sorted singly linked list by priority, but for a given order it is sorted by arrival. Which means, we will not be able to determine the insertion order in reverse, all we know is which came before which for a single priority.
+
+See `sortedll.h` for the __naive__ implementation.
+
+## Complexity of Operations
+
+1. PQ_first
+    - O(1)
+2. PQ_leave 
+    - O(1)
+3. PQ_enter
+    - O(N)
+
+And yes, we can do better.
