@@ -223,7 +223,7 @@ docker-compose.yaml	python_test/
 
 `-G` or `--color` adds colors to special files like folders and executables. For example, the executable `a2p1` will be shown as `a2p1*` with `ls -F`. There are also other indicators, `@` means the file has extended attributes, which you can view using `xattr`.
 
-You can also use `ls -a` to show all files, including hidden ones. Use `ls -A` to show all files except for `.` and `..` (run `ls -a` to see what I mean). Run `ls -la` to use long listing format (verbose).
+You can also use `ls -a` to show all files, including hidden ones. Use `ls -A` to show all files except for `.` and `..` (run `ls -a` to see what I mean). Run `ls -la` to use long listing format (verbose). Use `ls -ld` to treat directories as if it were a file.
 
 ```bash
 @ubuntu2404-012:~/cs138/assgts/assgt2/a2p1$ ls -la
@@ -1035,4 +1035,130 @@ $ egrep "^#include[ ]+["<].+[">]$" *.{h,c,cc}
 Congratulations, we have performed regex. `regex` libraries exist for most languages, just as proof of how powerful it is.
 
 Regex is a skill that takes years to master, although, the midterm expects us to be decently good with it.
+
+# UNIX File Permissions
+
+Each file and directory in UNIX has __three__ set of access patterns that define how three different sets of users may access it.
+
+1. User
+    - The UserID who owns that file.
+2. Group
+    - The UNIX group associated with that file.
+3. Other
+    - Everyone else who has an account on this machine.
+
+What is a UNIX group? It is an arbitrary collection of UserIDs that make sense in some organizational context. In practice group permissions are around the same as other.
+
+## See Permissions With `ls`
+
+To see permissions run `ls -l`.
+
+```bash
+drwxr-x--- 2 jfdoe cs138staff 4096 Oct 19 18:19 cs138/
+drwxr-x--- 2 jfdoe jfdoe 4096 Oct 21 08:51 cs247/
+-rw------- 1 jfdoe jfdoe 22714 Oct 21 08:50 test.cc
+-rw------- 1 jfdoe jfdoe 63332 Oct 21 08:50 notes.tex
+```
+
+Let's interpret this.
+
+We start with "d" (directory), "-" (file), or "l" (link). Afterwards we have 9 characters, split into 3 sets. The first set is for the user, the second set is for groups, the third set is for other. The permissions are "r" (read), "w" (write), and "x" (execute). A "-" (dash) means the permission is not granted.
+
+The columns are
+1. permissions
+2. \# of hard links
+3. owner's userID
+4. group ID
+5. size in bytes
+6. date of last change
+7. file name
+
+67
+
+## Read, Write, Execute
+
+Read and write are self-explanatory. The user can see and change the file. Execute means we are allowed to run the file as a program. The file should be a shell (.sh) or a binary executable for this to make sense.
+
+For directories, read means the user can ask what files are present, write means the user can add / delete files, execute means the user can enter (`cd`) the directory, and `ls` only works if read is permitted as well.
+
+Let's assume I am the user __jfdoe__.
+
+__`test.cc`__
+
+I am the owner of the file. I am allowed to read and write the contents. I cannot execute the file. Groups and others have no permissions for the file.
+
+__`cs138`__
+
+`cs138` is a directory. I own the directory. I can navigate, list files, add and remove files from the directory. Users from the group `cs138staff` can read the directory and enter the directory, but cannot add or remove files. Others have no permissions.
+
+### What Permissions to Give?
+
+In practice, do not give permissions easily. My professor tends to make his research files readable, directories readable and executable, but other things like teaching content and exams private. As students, we should keep everything private.
+
+## Permission Modification Commands
+
+Be aware, these are dangerous commands. They can allow unwanted users to access your files and may cause unintended consequences.
+
+### `chgrp`
+
+`chgrp` changes the group name associated with a file. Sometimes the group name is the same as the user name. This means you are the single user of the file.
+
+```bash
+$ chgrp [-R] group-name file / directory-list
+```
+
+`-R` means recursively modify group name of a directory. Let's see some examples.
+
+```bash
+$ chgrp cs138staff cs138 # course directory
+$ chgrp -R cs138staff cs138/a5 # assgt dir/files
+```
+
+We must associate group names along entire pathname and files. Creating and deleting groups is done only by `sysadmin` at `~/usr/bin/sudo`.
+
+### `chmod`
+
+`chmod` changes the permissions of a file.
+
+```bash
+$ chmod [-R] [ugoa] [+-=] [rmx] file / directory-list
+```
+
+`-R` same as above. We can specify which set (users, group, or other) or a (all) gets + (added), - (removed) or = (set) permissions.
+
+```bash
+chmod g-r,o-r,g-w,o-w foo
+chmod go-rw foo # short form
+chmod g+rx cs138
+chmod -R g=rwx cs138/a5
+```
+
+To achieve desired access, we must associate suitable permissions along entire paths and files. If a file is readable but its directory is not executable, we won't be able to see it.
+Fun fact, you can use octal to modify permissions. read = 4, write = 2, execute = 1. If owner was rwx it would translate to 4+2+1 = 7.
+
+### Exercise!
+
+```bash
+$ ls -ld code
+drwxr-xr-x 2 _____ _____ 4.0K Jan 15 2018 code/ # 8 years ago =(
+```
+
+Suppose we want to remove all permissions for others. How do we do that?
+
+```bash
+$ chmod o-rx code
+$ ls -ld code
+drwxr-xr-x 2 _____ _____ 4.0K Jan 15 2018 code/
+```
+
+What if you try accessing something forbidden?
+
+```bash
+$ chmod a-rwx code
+$ ls -ld code
+d--------- 2 _____ _____ 4.0K Jan 15 2018 code/
+$ cd code
+code: Permission denied.
+```
+
 
