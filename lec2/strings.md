@@ -283,7 +283,7 @@ What if we want to be able to read and write to a file __or__ one of the standar
 using namespace std;
 
 // The ampersand (&) means "reference parameter" (coming soon!)
-void printAnswer(ostream &output, string answer){
+void printAnswer(ostream &output, string answer) {
     output << "The answer is " << answer << endl;
 }
 
