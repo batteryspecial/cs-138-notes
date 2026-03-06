@@ -124,5 +124,3 @@ There are two basic solutions.
     - You waste space if you keep adding
     - Some hash approaches double the table in size every so often
     - Adding more buckets may not help much if your hash function is terrible
-
-
