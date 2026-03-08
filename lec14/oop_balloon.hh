@@ -21,6 +21,8 @@ Balloon::Balloon (string colour) { // another constructor
     this->colour = colour;
 }
 Balloon::~Balloon() {} // deconstructor
-    void Balloon::speak() const {
+
+// This member function promises not to modify the object’s non‑mutable data members
+void Balloon::speak() const {
     cout << "I'm a " << this->colour << " balloon!" << endl;
 }
