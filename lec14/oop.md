@@ -43,7 +43,7 @@ Take a look at `cballoon.c`. Would it not be nice to initialize the Balloon colo
 
 Let's implement the balloon class in OOP, and we will see how this is possible.
 
-As you may see, you can't really mess around with class pointers. Line 13 is actually copying a pointer, not copying the object. That leads to two pointers owning the same object.
+As you may see, you can't really mess around with access specifiers. Line 13 is actually copying a pointer, not copying the object. That leads to two pointers owning the same object, which is fine, but then we attempt to directly edit a private variable. In addition, we somehow delete the same object twice, which is just a double free.
 
 If you want to actually copy the object as a pointer you need to call the constructor like this.
 
