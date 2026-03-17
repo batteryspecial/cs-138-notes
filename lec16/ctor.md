@@ -167,5 +167,3 @@ Total __1__ operation.
 We notice, passing by initialization list automatically fills the object with the correct data, skipping the implicit call to Monster's default ctor.
 
 Another huge reason we favor init lists is because fields can be constants, in which case their value is set at initialization (i.e., just before the ctor body), and it will never change moving forward! Thus, initializing constants using an init expression is the only option.
-
-
