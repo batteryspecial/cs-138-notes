@@ -304,6 +304,8 @@ private:
     struct Node; // details below
     Node* first;
 };
+
+// Prevents others from accessing implementation details
 struct Stack::Node {
     string val;
     Node* next;

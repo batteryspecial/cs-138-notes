@@ -5,12 +5,12 @@ using namespace std;
 
 // POD struct, OK to have public vars
 struct Node {
-public :
-Node (string val, Node *next);
-Node (const Node& other);
-~Node();
-string val;
-Node *next;
+public:
+    Node (string val, Node *next);
+    Node (const Node& other);
+    ~Node();
+    string val;
+    Node *next;
 };
 
 // Does what you expect
