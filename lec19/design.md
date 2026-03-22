@@ -70,7 +70,7 @@ Our drawing tool will want to be able to treat all Figures in the same way somet
 
 We will start by implementing the base class in `figure_v1.hh`.
 
-## Observations
+## Design 1
 
 1. What is `protected`?
     - The `protected` keyword is an access modifier that turns a method into a family secret. Public to descendants but private for outsiders. Useful for implementing the API for the family.
@@ -105,7 +105,7 @@ To add on to our prior explanation, the descendant classes need a build receipe 
 
 It only makes sense to make the ctor protected. A secret shared within a specific inheritance hierarchy. __#OTF__
 
-## Ctors and Inheritance
+### Ctors and Inheritance
 
 If you inherit from a class, the "parent parts" have to be initialized. Usually, you will make an explicit choice of which parent ctor to call as the first element in the initializer list, like this.
 
@@ -121,7 +121,7 @@ Can we make the fields of Figure private?
 
 Here's an idea! Let the ABC manage everything. This is a great goal, but we need a good design process to figure things out.
 
-## Don't Repeat Yourself
+### Don't Repeat Yourself
 
 If you have something interesting to express in a software design, find a way to do it in only one place! So don't copy and paste procedures / methods from one place in the design to achieve "similar" functionality elsewhere.
 
@@ -132,7 +132,7 @@ If you have a set of objects with similar but not identical behaviors, put them 
 
 Using this, let's define the Circle in `circle_v1.hh`.
 
-## Child Responsibilities
+### Child Responsibilities
 
 You need the public in `: public Figure` or else you get private inheritance.
 
@@ -149,7 +149,7 @@ Note that x, y, and colour are part of the parent Figure, and that you can't use
 
 For example `Circle::draw()` accesses the x and y fields of Figure, so they can't be private in the parent, but they are protected, so `Circle` can access them!
 
-## Design Inconsistency
+### Design Inconsistency
 
 Inconsistencies. Sounds easy to avoid, actuall a super tricky question, even for trivial examples like these. Let's see the example `rectangle_v1.hh`. In `Circle`, we added the `radius`, and hence we used a getter / setter pair.
 
@@ -164,6 +164,69 @@ Having many eyes on an issue can lead to a solution that gives the best outcome 
 We have everything put together for you nicely in `figure_v1.cc`, demonstrating the core concepts of inheritance and polymorphism, as well as a neat range-based for loop, which we will get to.
 
 Don't worry, there will be a _v2_. Next, we will examine more advanced design patterns in our hierarchy.
+
+## Design Version 2
+
+Let's return to the `Figure` hierarchy and see if we can optimize parent data members, and we will do so by pushing parametrized common behaviors into the parent class.
+
+Let's take a look at the `Figure` class in `figure_v2.hh`. Interesting, we have a private pure virtual method. This might appear crazy, but don't worry, the children will override and provide proper definitions.
+
+`draw()` is no longer pure virtual. We do not need to provide separate definitions for the method anymore. We have a better design than our first attempt, because we have less repetition (especially for draw), and less that the child needs to do.
+
+We can conclude, __if you find yourself repeating the same thing in multiple child classes, there's probably something that can be pushed into the parent__.
+
+You might wonder, how does `getKind()` know which child it is operating on? We override its definition in the children and when the parent makes a general call, the children fill in the blanks (polymorphism).
+
+### The _TemplateMethod_ Design Pattern
+
+This is a trivial example of the TemplateMethod design pattern.
+- The parent has a high-level recipe that is the same for all children but the recipe has sub-pieces whose details will be different depending on the details of the children
+- The parent method is (typically) public, while the subcomponents are declared as private in the parent.
+- As an analogy to a word puzzle, the child classes implement the subcomponents (fill in the blanks), and the parent specify the general methods (the sentence with the blanks).
+
+### Example for Assignment 2
+
+```cpp
+class Justifier {
+    public:
+        // dtor and client-facing justifaction method
+        virtual ~Justifier();
+        void justifyMyText();
+    protected:
+        Justifier (int MaxLineLength, ifstream &instream, ofstream &outstream);
+    private:
+        virtual string justifyLine(string line) = 0; // pure virtual, will override depending on justification type
+
+        // member variables
+        const static int MaxLineLength;
+        ifstream &instream;
+        ofstream &outstream;
+};
+```
+
+## Design Version 3
+
+The template method pattern is a fundamental object oriented design idiom, and works really well most of the time, but we can do even better. Here's another rule for OOD, specifically for polymorphism.
+
+__Polymorphic methods should have different behaviours, not just return different values__.
+
+For example...
+- `area()` is a good example of a polymorphic method as the algorithms will differ a lot between the concrete classes.
+- `getKind()` is a bad example, as we're just returning a simple value.
+
+The good new is, we can redesign figure in a clean way.
+
+Let's example `figure_v3.cc`.
+
+We turned `kind` into a const member variable! The parent does not have value for it, but the children do. Each child sends a different ctor call, and in the init list, `Figure` is init using the definitions provided by the child.
+
+The kind of the Figure will never change for any instance of an object, hence const. This is not only safe, but very elegant.
+
+Just remember, member variables are init in the order of declaration within the class, not the order of the initializers listed in the constructor. Thus we have to declare `Figure()` first (base class) then `radius` which is exclusive to `Circle`.
+
+If you may recall from lec. day 16, we mentioned `const` variables have their value set at initialization, thus using the init list is really the only (and best) option here.
+
+That concludes our inheritance design workshop.
 
 # Design Patterns
 
