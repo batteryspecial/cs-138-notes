@@ -1,10 +1,79 @@
+# Reviewing the STL Library
+
+C++ has a general-purpose library classes and functions called the Standard Library Template (STL).
+
+1. Generic Containers
+    - Take an element type as the parameter. Ranges from general-purpose storage to specific use cases.
+    - `vector`, `list`, `stack`, `queue`, `deque`, `map`, `set`, etc.
+
+We already covered these.
+
+2. Iterators
+    - Kinds of variables that can navigate through containers.
+
+3. Algorithms
+    - Take a begin-end iterator pair and perform some sort of procedure on the elements in the range.
+    - `sort`, `random_shuffle`, `next_permutation`, etc.
+
+These two, we need to cover.
+
+## Reviewing Iterators
+
+Suppose we have a data container `v` with a very complex, but hidden internal structure. An iterator `vi` allows the client to move through the container one element at a time without knowing any specifics.
+
+Three parts. Where's the first element, how do I get to the next element, how do I know when I'm done.
+
+There are many different kinds of operators depending on context (mainly because of how they're implemented differently).
+
+| Category | Example Containers | Capabilities |
+| :--- | :--- | :--- |
+| **Input Iterator** | `std::istream_iterator` | Read elements **once**, move forward only. |
+| **Output Iterator** | `std::ostream_iterator` | Write elements **once**, move forward only. |
+| **Forward Iterator** | `std::forward_list` | Read/write multiple times, move forward only. |
+| **Bidirectional Iterator** | `std::list`, `std::set` | Move forward **and** backward. |
+| **Random Access Iterator** | `std::vector`, `std::deque` | All above + jump to any position in constant time (`it + n`). |
+| **Contiguous Iterator** *(C++20)* | `std::array`, `std::vector` | Random access + guarantee elements are stored contiguously in memory. |
+
+## Algorithms and Iterators
+
+C++ Standard Library algorithms perform an abstract operation on a container of data, like `sort`, `random_shuffle`, `find`, `max_element`... they take iterators, specifically, the `begin()` and `end()` iterators.
+
+They can be used on _any_ data structure, including ones you define yourself.
+
+The usual call syntax looks like this.
+
+```cpp
+f(it1, it2, arg1, arg2,...,argn)
+```
+
+Let's say `m` is a list and you're looking for an element that matches a value.
+
+```cpp
+std::find (m.begin(), m.end(), val)
+```
+
+This returns an iterator to the matching element, if one is found. Returns
+m.end() if no match is found.
+
+Under the hood, `operator==()` is used to test for equality.
+
+
 # Algorithms and Container Methods
 
-BY using iterators, we usually need to define only one version of an algorithm.
+By using iterators, we usually need to define only one version of an algorithm.
 
-The point is, there is no one algorithm for everything. There are stand-aloine algorithms in many different STL containers. Red means _there's a stand-alone implementation of this method_. In addition, the implementation of these containers differ. 
+The point is, there is no one algorithm for everything. There are stand-aloine algorithms in many different STL containers. Red means _there's a stand-alone implementation of this method_. In addition, the implementation of these containers differ.
 
-Let's take a look at some methods in the algorithm library.
+In practice, we sometimes provide tuned container-specific versions of some methods of the container for efficiency.
+- std::find() using naive iterators is O(N)
+- set::find() is O(log N) since it typically uses a BST-like implementation
+- std::sort() uses a variation of quicksort, which is only efficient when there's random access to the data, as in vector and deque but not list which provides its own sort() method
+- [multi]set and [multi]map are kept sorted
+
+## A List of STL Container Methods
+![alt text](<img/containermethods.png>)
+
+Aside from container methods, there's also an `<algorithms>` library. Let's take a look at some methods in that library.
 
 ```cpp
 #include <iostream>
