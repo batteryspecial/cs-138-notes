@@ -1,5 +1,57 @@
 # Polymorphic Containers
-...
+Suppose we want to extend the concept of figures. We want a `Scene` which has an ordered list of `Figures` like `Circle`, `Rectangle`, and maybe some other concrete classes we have not yet implemented.
+
+The scene will have a contextual caption, and an ordered list of `Figures`, which we can implement using a vector. If we want to draw the scene, print the caption and draw the Figures in order.
+
+Here comes the question. What should the vector contain?
+
+1. vector<Figure>
+2. vector<Figure&>
+3. vector<Figure*>
+
+By inspection, 1 and 2 are not correct. For 1, we have a vector of `Figure`s, which is an ABC and cannot be instantiated. Second, vectors can only store objects. `Figure&` is not an object, it is a reference.
+
+Let's say `Figure`, for some reason, is not an ABC. What would happen if we tried pushing a circle into the vector? The external definitions made by circle relative to the figure would be cut off. This is a known behavior called __object slicing__.
+
+3 works. Although the static type is `Figure*`, we can easily allow it to hold a dynamically typed child. Any virtual functions overridden by the child can still be called through the ABC. The actual objects would likely be stored on the heap, and at the end we need to figure out who is reponsible for cleaning up the heap.
+
+Running `scene.cc` using the following main function.
+
+```cpp
+int main (int argc, char* argv[]) {
+    Circle* c1 = new Circle {"cyan", 0, 0, 5};
+    Figure* f1 = new Circle {"blue", 2, 5, 6};
+    Circle* c2 = new Circle {"green", 3, 4, 25};
+    Scene s {};
+    s.setCaption("Colorful Figures");
+    s.addFigure(c1);
+    s.addFigure(f1);
+    s.addFigure(c2);
+    s.draw();
+}
+```
+
+We get our expected output.
+
+```bash
+$ ./a.out
+Caption: "Colorful Figures"
+Circle green 3 4
+Circle blue 2 5
+Circle cyan 0 0
+```
+
+# Liskov's Principle of Substitutability
+
+Within an inheritance hierarchy of entity kinds, we want to bump the commonalities up as high as possible in the inheritance tree. Even if we don't know how to implement them concretely. We make these functions pure virtual.
+
+LPOS says we should always be able to conceptually replace any instance of any parent with any child. LPOS does not always hold, it is something that makes common sense.
+
+The parent class should be a generalized version of its children. A child class __is a__ specialized version of the parent class.
+- Circle __is a__ figure. Rectangle __is a__ polygon. Polygon __is a__ figure.
+- CenterText __is a__ justifier. RaggedRight __is a__ justifier.
+
+There are many counter examples, here's [one](http://thedailywtf.com/Articles/What,-Me-Layer.aspx) from Java.
 
 # Inheriting from `vector<>`?!
 

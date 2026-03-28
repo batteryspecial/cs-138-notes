@@ -1,0 +1,23 @@
+#include "figure_h.txt"
+
+string Scene::getCaption () const {
+    return caption;
+}
+void Scene::setCaption(string caption) {
+    this->caption = caption;
+}
+void Scene::addFigure (Figure* f) {
+    // Don't bother to add nullptr ptrs
+    if (nullptr != f) {
+        v.push_back(f); // Works for Circle*, Rectangle*, ...
+    }
+}
+void Scene::draw() const {
+    cout << "Caption: \"" << caption << "\"\n";
+
+    // Draw from last (farthest object) to first (nearest)
+    for (size_t i = v.size()-1; i>= 0; i--) {
+        Figure* f = v.at(i);
+        f->draw(); // Works for Circle*, Rectangle*, assuming Figure::draw() is virtual
+    }
+}

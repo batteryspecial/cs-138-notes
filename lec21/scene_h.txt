@@ -1,0 +1,25 @@
+#include <vector>
+#include <string>
+using namespace std;
+
+class Scene {
+    public:
+        Scene();
+        virtual ~Scene();
+        string getCaption() const;
+        void setCaption(string caption) ;
+        void addFigure(Figure* f);
+        void draw() const;
+    private:
+        vector<Figure*> v;
+        string caption;
+};
+
+Scene::Scene() {}
+Scene::~Scene() { // Assume we own these Figures
+    while (!v.empty()) {
+        Figure* f = v.back();
+        v.pop_back();
+        delete f;
+    }
+}
