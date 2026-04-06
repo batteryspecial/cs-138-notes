@@ -69,7 +69,7 @@ __What is Linux?__
 
 The UNIX file system is organized under "/", the root directory.
 
-![alt text](image.png)
+![alt text](img/image2.png)
 
 For example you could host your personal site under `public_html`.
 
@@ -613,7 +613,7 @@ Every command is associated with three standard files!
 
 In UNIX, `stdin`, `stdout`, `stderr`. In C++, we have our streams `cin`, `cout`, `cerr`. By default these are connected to the keyboard (input) and the UI (output & error).
 
-![alt text](<截屏2026-02-01 下午11.01.01.png>)
+![alt text](img/image0.png)
 
 ## Example with `sort`
 
