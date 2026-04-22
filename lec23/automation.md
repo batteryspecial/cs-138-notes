@@ -2,9 +2,9 @@
 
 There is an old but powerful UNIX command line tool called `make`. It can automate build recipes. It's decently smart about what needs to be rebuilt after changes occur by tracing dependencies.
 
-However, you need to provide a recipe, called a MakeFile. There are many other far more sophisticated tools like ant, maven, SCons, etc. However, if you use popular IDEs like IntelliJ and VSCode automatically tracks what needs to be recompiled.
+However, you need to provide a recipe, called a MakeFile. There are many other far more sophisticated tools like ant, maven, SCons, etc. However, if you use popular IDEs like IntelliJ and VSCode, they automatically track what needs to be recompiled.
 
-Make may be much smarter at recompiling only bits that really need it. Not file leve, function level.
+Make is smarter at recompiling only bits that really need it. Not file leve, function level.
 
 ```bash
 $ ls
@@ -105,5 +105,7 @@ __Java__
 
 ![alt text](img/image1.png)
 ![alt text](img/image2.png)
+
 Note, `final` methods are statically dispatched (hard coded at compile time), but that's semantically indistinguishable from dynamic dispatch (searches for definition at run-time).
+
 ![alt text](img/image3.png)
